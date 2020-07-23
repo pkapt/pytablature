@@ -73,9 +73,13 @@ class Tab:
                 guitar_freq = string_note * (2**(step/12))
                 if guitar_freq == freq:
                     matches.append(TabNote(string_num, step))
-        
-        
-        
+        if matches:
+            lowest = 24
+            for match in matches:
+                string_num = match.string_num()
+                if string_num < lowest:
+                    lowest = string_num
+            return lowest
 
 if __name__ == '__main__':
     print(freq("A#14"))
