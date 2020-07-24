@@ -3,23 +3,25 @@ from math import log2, pow
 
 class Converter:
     A4 = 440
-    C0 = self.A4*pow(2, -4.75)
+    C0 = A4*pow(2, -4.75)
     NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    
+    def __init__(self):
+        pass
 
-    def pitch(freq):
+    def pitch(self, freq):
         h = round(12*log2(freq/self.C0))
         octave = h // 12
         n = h % 12
         return self.NOTES[n] + str(octave)
 
-    def freq(name):
+    def freq(self, name):
         if name[1] == '#':
             octave = int(name[2:])
             steps = self.NOTES.index(name[0:2].upper())
         else:
             octave = int(name[1])
             steps = self.NOTES.index(name[0].upper())
-        print(octave, steps)
         return (self.C0*(2**octave))*(2**(steps/12))
 
 class Note:
@@ -42,9 +44,9 @@ class Note:
 class TabNote:
     """ Supplies a class to define a tab note object """
 
-    def __init__(self, _string_num=None, _fret_num=None):
-        self._string_num = _string_num
-        self._fret_num = _fret_num
+    def __init__(self, string_num=None, fret_num=None):
+        self._string_num = string_num
+        self._fret_num = fret_num
     
     def string_num(self):
         return self._string_num
@@ -53,7 +55,7 @@ class TabNote:
         return self._fret_num
     
     def __str__(self):
-        return f'Tab note with string {self._string_num} and duration {self._fret_num}'
+        return f'Tab note with string {self._string_num} and fret {self._fret_num}'
 
 
 class Tab:
@@ -65,21 +67,24 @@ class Tab:
     def generate(self):
         pass
 
-    def _convert_pitch_to_tab(self, pitch):
-        freq = Converter.freq(pitch)
+    def convert_pitch_to_tab(self, pitch):
+        c = Converter()
+        freq = c.freq(pitch)
         matches = []
         for string_num, string_note,  in enumerate(const.GUITAR_TUNING):
-            for step in const.GUITAR_FRETS:
-                guitar_freq = string_note * (2**(step/12))
-                if guitar_freq == freq:
-                    matches.append(TabNote(string_num, step))
+            for step in range(const.GUITAR_FRETS):
+                guitar_freq = c.freq(string_note) * (2**(step/12))
+                if round(guitar_freq, 1) == round(freq, 1):
+                    matches.append(TabNote(string_num + 1, step))
         if matches:
-            lowest = 24
+            lowest = TabNote(0, 24)
             for match in matches:
-                string_num = match.string_num()
-                if string_num < lowest:
-                    lowest = string_num
+                fret_num = match.fret_num()
+                if fret_num < lowest.fret_num():
+                    lowest = match
             return lowest
 
 if __name__ == '__main__':
-    print(freq("A#14"))
+    tab = Tab()
+    note = tab.convert_pitch_to_tab("C4")
+    print(note)
