@@ -61,14 +61,23 @@ class Staff:
     """ Supplies a class to create a staff object """
 
     NOTE_SPACING = 3
+    STAFF_LENGTH = 100
 
     def __init__(self):
-        self.staff = [["-" for _ in range(100)] for _ in range(6)]
+        self.staff = [["-" for _ in range(self.STAFF_LENGTH)] for _ in range(const.NUM_STRINGS)]
         self.pos = self.NOTE_SPACING
+        self.beat_within_measure = 0
     
-    def add_note(self, note):
-        self.staff[note.string_num() - 1][self.pos] = str(note.fret_num())
+    def add_note(self, tab_note, note):
+        self.staff[tab_note.string_num() - 1][self.pos] = str(tab_note.fret_num())
         self.pos += self.NOTE_SPACING
+        self.beat_within_measure += float(4/int(note.duration()))
+
+        if self.beat_within_measure == 4:
+            for i in range(const.NUM_STRINGS):
+                self.staff[i][self.pos] = '|'
+            self.beat_within_measure = 0
+            self.pos += self.NOTE_SPACING
     
     def __str__(self):
         for line in self.staff:
@@ -76,7 +85,6 @@ class Staff:
                 print(note, end="")
             print("")
         return ""
-
 
 class Tab:
     """ Supplies a class to generate guitar tabs from a list of note """
@@ -88,8 +96,8 @@ class Tab:
         self.tab_notes = [self.convert_pitch_to_tab(note) for note in notes]
         self.staff = Staff()
 
-        for note in self.tab_notes:
-            self.staff.add_note(note)
+        for i, note in enumerate(self.tab_notes):
+            self.staff.add_note(note, notes[i])
 
         print(self.staff)
 
@@ -97,11 +105,11 @@ class Tab:
         c = Converter()
         freq = c.freq(pitch.pitch())
         matches = []
-        for string_num, string_note,  in enumerate(const.GUITAR_TUNING):
+        for string_num, string_note,  in enumerate(const.GUITAR_TUNING, 1):
             for step in range(const.GUITAR_FRETS):
                 guitar_freq = c.freq(string_note) * (2**(step/12))
                 if round(guitar_freq, 1) == round(freq, 1):
-                    matches.append(TabNote(string_num + 1, step))
+                    matches.append(TabNote(string_num, step))
         if matches:
             lowest = TabNote(0, 24)
             for match in matches:
@@ -118,6 +126,14 @@ class Tab:
 
 if __name__ == '__main__':
     notes = [Note("C3", const.QUARTER), 
+             Note("D3", const.QUARTER),
+             Note("E3", const.QUARTER),
+             Note("F3", const.QUARTER),
+             Note("G3", const.QUARTER),
+             Note("A3", const.QUARTER),
+             Note("B3", const.QUARTER),
+             Note("C4", const.QUARTER),
+             Note("C3", const.QUARTER), 
              Note("D3", const.QUARTER),
              Note("E3", const.QUARTER),
              Note("F3", const.QUARTER),
