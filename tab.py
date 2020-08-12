@@ -57,6 +57,26 @@ class TabNote:
     def __str__(self):
         return f'Tab note with string {self._string_num} and fret {self._fret_num}'
 
+class Staff:
+    """ Supplies a class to create a staff object """
+
+    NOTE_SPACING = 3
+
+    def __init__(self):
+        self.staff = [["-" for _ in range(100)] for _ in range(6)]
+        self.pos = self.NOTE_SPACING
+    
+    def add_note(self, note):
+        self.staff[note.string_num() - 1][self.pos] = str(note.fret_num())
+        self.pos += self.NOTE_SPACING
+    
+    def __str__(self):
+        for line in self.staff:
+            for note in line:
+                print(note, end="")
+            print("")
+        return ""
+
 
 class Tab:
     """ Supplies a class to generate guitar tabs from a list of note """
@@ -65,11 +85,17 @@ class Tab:
         self.notes = notes
 
     def generate(self):
-        pass
+        self.tab_notes = [self.convert_pitch_to_tab(note) for note in notes]
+        self.staff = Staff()
+
+        for note in self.tab_notes:
+            self.staff.add_note(note)
+
+        print(self.staff)
 
     def convert_pitch_to_tab(self, pitch):
         c = Converter()
-        freq = c.freq(pitch)
+        freq = c.freq(pitch.pitch())
         matches = []
         for string_num, string_note,  in enumerate(const.GUITAR_TUNING):
             for step in range(const.GUITAR_FRETS):
@@ -83,8 +109,22 @@ class Tab:
                 if fret_num < lowest.fret_num():
                     lowest = match
             return lowest
+        
+    def _print_note(self, note):
+        for i in range(1,7):
+            if i == note.string_num():
+                pass
+        
 
 if __name__ == '__main__':
-    tab = Tab()
-    note = tab.convert_pitch_to_tab("C4")
-    print(note)
+    notes = [Note("C3", const.QUARTER), 
+             Note("D3", const.QUARTER),
+             Note("E3", const.QUARTER),
+             Note("F3", const.QUARTER),
+             Note("G3", const.QUARTER),
+             Note("A3", const.QUARTER),
+             Note("B3", const.QUARTER),
+             Note("C4", const.QUARTER)]
+
+    tab = Tab(notes)
+    tab.generate()
