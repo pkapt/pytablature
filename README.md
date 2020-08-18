@@ -2,6 +2,6 @@
 
 python library to create/edit tabs for guitar
 
-## Goals
+## install dependancies
 
-1. input a list of notes, output tab
+pip install -r req.txt
