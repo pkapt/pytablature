@@ -1,3 +1,5 @@
+from .const import *
+
 class Staff:
     """ Supplies a class to create a staff object """
 
@@ -5,7 +7,7 @@ class Staff:
     STAFF_LENGTH = 100
 
     def __init__(self):
-        self.staff = [["-" for _ in range(self.STAFF_LENGTH)] for _ in range(const.NUM_STRINGS)]
+        self.staff = [["-" for _ in range(self.STAFF_LENGTH)] for _ in range(NUM_STRINGS)]
         self.pos = self.NOTE_SPACING
         self.beat_within_measure = 0
     
@@ -15,7 +17,7 @@ class Staff:
         self.beat_within_measure += float(4/int(note.duration()))
 
         if self.beat_within_measure == 4:
-            for i in range(const.NUM_STRINGS):
+            for i in range(NUM_STRINGS):
                 self.staff[i][self.pos] = '|'
             self.beat_within_measure = 0
             self.pos += self.NOTE_SPACING

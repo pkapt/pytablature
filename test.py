@@ -1,3 +1,7 @@
+from tab import Tab
+from tab import Note
+from tab import const
+
 if __name__ == '__main__':
     notes = [Note("C3", const.QUARTER), 
              Note("D3", const.QUARTER),

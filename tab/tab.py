@@ -1,6 +1,9 @@
-import const
-from math import log2, pow
+from .const import *
+from .note import Note
+from .tabnote import TabNote
+from .staff import Staff
 from pitches import Converter
+
 
 class Tab:
     """ Supplies a class to generate guitar tabs from a list of note """
@@ -9,11 +12,11 @@ class Tab:
         self.notes = notes
 
     def generate(self):
-        self.tab_notes = [self.convert_pitch_to_tab(note) for note in notes]
+        self.tab_notes = [self.convert_pitch_to_tab(note) for note in self.notes]
         self.staff = Staff()
 
         for i, note in enumerate(self.tab_notes):
-            self.staff.add_note(note, notes[i])
+            self.staff.add_note(note, self.notes[i])
 
         print(self.staff)
 
@@ -21,8 +24,8 @@ class Tab:
         c = Converter()
         freq = c.freq(pitch.pitch())
         matches = []
-        for string_num, string_note,  in enumerate(const.GUITAR_TUNING, 1):
-            for step in range(const.GUITAR_FRETS):
+        for string_num, string_note,  in enumerate(GUITAR_TUNING, 1):
+            for step in range(  GUITAR_FRETS):
                 guitar_freq = c.freq(string_note) * (2**(step/12))
                 if round(guitar_freq, 1) == round(freq, 1):
                     matches.append(TabNote(string_num, step))
